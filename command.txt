@@ -1,0 +1,2 @@
+# Watch your custom Sass for changes and compile it to CSS
+sass --watch ./style/scss/home.scss ./style/css/home.css

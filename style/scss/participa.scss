@@ -1,0 +1,31 @@
+$borda-cor1: #dc3545;
+body{
+    height: 100vh;
+    width: 100%;
+    background: rgb(40,0,0);
+    background: radial-gradient(circle, rgba(40,0,0,1) 0%, rgba(145,24,39,1) 100%);
+    display: grid;
+    place-items: center;
+
+    .login_box{
+        .volta{
+            position: absolute;
+            padding: 1rem;
+            background-color: #DEE2E6;
+            display: flex;
+        }
+        .img_login{
+            width: 128px;
+            height: 128px;
+            
+        }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+        }
+    }
+}
+#alerta{
+    font-size: smaller;
+    opacity: 0%;
+    pointer-events: none;
+}

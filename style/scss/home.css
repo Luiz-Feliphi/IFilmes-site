@@ -1,0 +1,19 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+body div .opcao {
+  border-bottom: 5px solid rgb(108, 117, 125);
+  transition: all 0.2s;
+}
+body div .opcao:hover {
+  border-bottom: 5px solid white;
+}
+body div .icon-filme {
+  color: #fff;
+}
+body div #logo {
+  border: 5px solid rgb(0, 0, 0);
+  border-radius: 10%;
+  margin-right: 5px;
+}
+body div nav #sair_div {
+  width: 6%;
+}/*# sourceMappingURL=home.css.map */

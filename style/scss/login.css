@@ -1,0 +1,21 @@
+body {
+  height: 100vh;
+  width: 100%;
+  background: rgb(40, 0, 0);
+  background: radial-gradient(circle, rgb(40, 0, 0) 0%, rgb(145, 24, 39) 100%);
+  display: grid;
+  place-items: center;
+}
+body .login_box .img_login {
+  width: 128px;
+  height: 128px;
+}
+body .login_box input[type=number]::-webkit-inner-spin-button, body .login_box input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+#alerta {
+  font-size: smaller;
+  opacity: 0%;
+  pointer-events: none;
+}/*# sourceMappingURL=login.css.map */

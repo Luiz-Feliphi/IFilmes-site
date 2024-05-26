@@ -1,0 +1,26 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+$bordar-largura-logo: 5px;
+$bordar-raio-logo: 10%;
+$color-background2: rgb(108, 117, 125);
+$color-background1: rgb(37, 70, 100);
+
+body{
+    div{
+        .opcao{
+            border-bottom: 5px solid $color-background2;
+            transition: all 0.2s;
+        }
+        .opcao:hover{
+            border-bottom: 5px solid white;
+        }
+        .icon-filme{
+            color: #fff;
+        }
+        nav{
+            #sair_div{
+                width: 6%;
+            }
+        }
+    }
+}
