@@ -10,6 +10,39 @@ if (!isset($_SESSION['matricula'])) {
 
 // Obtém a matrícula do usuário logado
 $logado = $_SESSION['matricula'];
+//configuração
+$sql_config = "SELECT * FROM config_tb WHERE id = 1";
+$result_config = $conn->query($sql_config);
+$row = mysqli_fetch_assoc($result_config);
+
+if (isset($_GET['sugerir_AorF'])) {
+    $sugerir_AorF = $_GET['sugerir_AorF'];
+    $sql_config = "UPDATE config_tb SET sugerir_AorF = $sugerir_AorF WHERE id = 1";
+    $result_config = $conn->query($sql_config);
+    header('Location: sugeriF.php');
+} else if (isset($_GET['sugerir_AorF']) == FALSE) {
+    $sql_config = "SELECT * FROM config_tb WHERE id = 1";
+    $result_config = $conn->query($sql_config);
+}
+//configuração
+$sql_matricula_sugi = "SELECT * FROM sugeri_envi WHERE matricula = '$logado'";
+$result_matricula_sugi = $conn->query($sql_matricula_sugi);
+if($result_matricula_sugi->num_rows > 0){
+    $row_matricula_sugi = mysqli_fetch_assoc($result_matricula_sugi);
+    if($row_matricula_sugi['matricula'] == $logado || $row['sugerir_AorF'] == 0){
+        $sugeri_C_disabled = 'disabled';
+        $sugeri_disabled = 'disabled';
+    } else {
+        $sugeri_C_disabled = '';
+        $sugeri_disabled = 'required';
+    }
+} else if($row['sugerir_AorF'] == 0){
+    $sugeri_C_disabled = 'disabled';
+    $sugeri_disabled = 'disabled';
+} else {
+    $sugeri_C_disabled = '';
+    $sugeri_disabled = 'required';
+}
 ?>
 
 <!DOCTYPE html>
@@ -67,7 +100,15 @@ $logado = $_SESSION['matricula'];
             </div>
             <?php if ($logado == '19111413'): ?>
                 <!--Fechar-->
-                    <button class="navbar-brand d-flex align-items-center me-2 ms-2 text-white btn btn-danger close"id="fecharInputs" style="font-size: smaller;"></button>
+                <?php if ($row['sugerir_AorF'] == 1): ?>
+                    <a href="sugeriF.php?sugerir_AorF=0"
+                        class="navbar-brand d-flex align-items-center me-2 ms-2 text-white btn btn-danger close"
+                        id="fecharInputs" style="font-size: smaller;">Fechar</a>
+                <?php else: ?>
+                    <a href="sugeriF.php?sugerir_AorF=1"
+                        class="navbar-brand d-flex align-items-center me-2 ms-2 text-white btn btn-success close"
+                        id="fecharInputs" style="font-size: smaller;">Abrir</a>
+                <?php endif; ?>
                 <!--Fechar-->
             <?php endif; ?>
             <a class="navbar-brand d-flex align-items-center me-2 ms-2 text-white btn btn-danger sair"
@@ -87,36 +128,24 @@ $logado = $_SESSION['matricula'];
     <!--Sugestão de Filme-->
     <div class="d-flex flex-wrap justify-content-center mt-5">
         <div class="card border border-3 rounded bg-primary border-primary" style="width: 18rem;">
-            <form method="post" action="processar_sugestao.php">
+            <form method="post" action="processar_sugestao.php?matricula=<?php echo $logado?>">
                 <input type="text" class="form-control mt-2" name="imagem_link" placeholder="Link da Imagem"
-                    aria-label="Username" aria-describedby="basic-addon1" <?php if (isset($_SESSION['ultima_sugestao'])) {
-                        echo 'disabled';
-                    } ?>required>
+                    aria-label="Username" aria-describedby="basic-addon1" <?php echo $sugeri_disabled;?>>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
                     width="286px" height="286px" class="card-img-top rounded-0" alt="...">
                 <div class="card-body bg-white">
                     <ul class="list-group list-group-flush">
                         <h5 class="card-title"><input type="text" class="form-control" name="nome" placeholder="Nome"
-                                aria-label="Username" aria-describedby="basic-addon1" <?php if (isset($_SESSION['ultima_sugestao'])) {
-                                    echo 'disabled';
-                                } ?>required></h5>
+                                aria-label="Username" aria-describedby="basic-addon1" <?php echo $sugeri_disabled;?>></h5>
                         <span class="input-group-text">Descrição</span>
-                        <?php
-                        if (isset($_SESSION['ultima_sugestao'])) {
-                            echo '<input class="form-control" type="text" placeholder=" " aria-label="Disabled input example" disabled required>';
-                        } else {
-                            echo '<textarea class="form-control mt-1" name="descricao" aria-label="Descrição" required></textarea>';
-                        }
-                        ?>
+                        <textarea name="descricao" class="form-control" type="text" placeholder=" " aria-label="Disabled input example" <?php echo $sugeri_disabled;?>> </textarea>
                         <h5 class="card-title">
                             <input type="text" class="form-control mt-2" name="posto_por" placeholder="Sugerido Por"
-                                aria-label="Username" aria-describedby="basic-addon1" <?php if (isset($_SESSION['ultima_sugestao'])) {
-                                    echo 'disabled';
-                                } ?>>
+                                aria-label="Username" aria-describedby="basic-addon1" <?php echo $sugeri_C_disabled; ?>>
                             <h6 style="font-size: 9pt;" class="text-body-tertiary d-flex justify-content-end">
                                 <div class="text-body-emphasis">
                                     <input class="form-check-input anonymo" type="checkbox" value=""
-                                        id="flexCheckDefault">
+                                        id="flexCheckDefault" <?php echo $sugeri_C_disabled; ?>>
                                     <label class="form-check-label" for="flexCheckDefault">
                                         Anonymo
                                     </label>
@@ -124,7 +153,8 @@ $logado = $_SESSION['matricula'];
                             </h6>
                         </h5>
                         <input type="submit"
-                            class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary sugestao" value="Sugerir">
+                            class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary sugestao"
+                            value="Sugerir" <?php echo $sugeri_disabled;?>>
                     </ul>
                 </div>
             </form>
@@ -135,7 +165,8 @@ $logado = $_SESSION['matricula'];
     <div class="w-100 d-flex justify-content-end">
         <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
             <i class="bi bi-film me-2 icon-filme"></i>
-            <p id="dia-ifilmes" class="m-0 badge text-bg-danger "></p>
+            <p id="dia-ifilmes"
+                class="m-0 badge <?php echo $row['filme_AorF'] == 1 ? 'text-bg-success' : 'text-bg-danger'; ?> "></p>
         </div>
     </div>
     <!--DIA DO FILME-->
@@ -210,78 +241,7 @@ $logado = $_SESSION['matricula'];
         });
 
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var fecharInputs = document.getElementById('fecharInputs');
-            var inputs = document.querySelectorAll('input, textarea');
-            var botaoSugerir = document.querySelector('.sugestao');
-            var botaoAbrir = localStorage.getItem('inputsFechados') === 'true';
 
-            function atualizarEstadoBotao() {
-                if (botaoAbrir) {
-                    inputs.forEach(function (input) {
-                        input.setAttribute('disabled', 'disabled');
-                    });
-                    botaoSugerir.setAttribute('disabled', 'disabled');
-                    fecharInputs.textContent = 'Abrir';
-                    fecharInputs.classList.remove('btn-danger');
-                    fecharInputs.classList.add('btn-success');
-                } else {
-                    inputs.forEach(function (input) {
-                        input.removeAttribute('disabled');
-                    });
-                    botaoSugerir.removeAttribute('disabled');
-                    fecharInputs.textContent = 'Fechar';
-                    fecharInputs.classList.remove('btn-success');
-                    fecharInputs.classList.add('btn-danger');
-                }
-            }
-
-            atualizarEstadoBotao();
-
-            fecharInputs.addEventListener('click', function () {
-                botaoAbrir = !botaoAbrir;
-                localStorage.setItem('inputsFechados', botaoAbrir);
-                atualizarEstadoBotao();
-            });
-        });
-
-
-
-        // Função para abrir os inputs
-        function abrirInputs() {
-            var inputs = document.querySelectorAll('input, textarea, button');
-            inputs.forEach(function (input) {
-                input.disabled = false;
-                input.classList.remove('disabled-input');
-            });
-            // Remove a informação do armazenamento local
-            localStorage.removeItem('inputsDisabled');
-
-            // Altera o texto e a classe do botão
-            var botaoFechar = document.getElementById('fecharInputs');
-            botaoFechar.textContent = 'Fechar';
-            botaoFechar.classList.remove('btn-success');
-            botaoFechar.classList.add('btn-danger');
-        }
-
-        // Adiciona um event listener para o botão "Fechar/Abrir"
-        document.getElementById('fecharInputs').addEventListener('click', function () {
-            if (localStorage.getItem('inputsDisabled')) {
-                abrirInputs();
-            } else {
-                fecharInputs();
-            }
-        });
-
-        // Verifica se os inputs devem ser desabilitados ao carregar a página
-        window.addEventListener('load', function () {
-            var inputsDisabled = localStorage.getItem('inputsDisabled');
-            if (inputsDisabled) {
-                fecharInputs();
-            }
-        });
-    </script>
     <script src="../js/script-home_.js"></script>
 </body>
 

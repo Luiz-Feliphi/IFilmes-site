@@ -10,13 +10,18 @@ $logado = $_SESSION['matricula'];
 // Verifica se o usuário é um administrador
 $logado = $_SESSION['matricula'];
 
-if($logado != '19111413'){
+if ($logado != '19111413') {
     header('Location: home.php');
     exit();
 }
 
 $sql = "SELECT * FROM cadastrar_filmes ORDER BY id DESC";
 $result = $conn->query($sql);
+//configuração
+$sql_config = "SELECT * FROM config_tb WHERE id = 1";
+$result_config = $conn->query($sql_config);
+$row = mysqli_fetch_assoc($result_config);
+//configuração
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -29,6 +34,7 @@ $result = $conn->query($sql);
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="shortcut icon" href="../img/movie.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>IFilmes Web Site</title>
 </head>
 
@@ -142,10 +148,17 @@ $result = $conn->query($sql);
     <div class="w-100 d-flex justify-content-end">
         <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
             <i class="bi bi-film me-2 icon-filme"></i>
-            <p id="dia-ifilmes" class="m-0 badge text-bg-danger "></p>
+            <p id="dia-ifilmes"
+                class="m-0 badge <?php echo $row['filme_AorF'] == 1 ? 'text-bg-success' : 'text-bg-danger'; ?> "></p>
         </div>
     </div>
 
+    <script>
+        $('.card-img-top').on('error', function () {
+            console.log('A imagem falhou ao carregar.');
+            $(this).attr('src', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'); // Substitui a imagem por uma alternativa
+        });
+    </script>
     <script src="../js/script-home_.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

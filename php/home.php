@@ -8,6 +8,23 @@ if ((!isset($_SESSION['matricula']) == true)) {
 
 $sql = "SELECT * FROM filmes_tb ORDER BY id DESC";
 $result = $conn->query($sql);
+
+// configuração
+$sql_config = "SELECT * FROM config_tb WHERE id = 1";
+$result_config = $conn->query($sql_config);
+$info_config = mysqli_fetch_assoc($result_config);
+
+if (isset($_GET['filme_AorF'])) {
+  $filme_AorF = $_GET['filme_AorF'];
+  $sql_update = "UPDATE config_tb SET filme_AorF = $filme_AorF WHERE id = 1";
+  $result_update = $conn->query($sql_update);
+  header('Location: home.php');
+} else if(isset($_GET['filme_AorF']) == FALSE){
+  $sql_config = "SELECT * FROM config_tb WHERE id = 1";
+  $result_config = $conn->query($sql_config);
+}
+$filme_AorF = $info_config['filme_AorF'];
+$bg_class = $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -77,8 +94,21 @@ $result = $conn->query($sql);
   </span>
   <div class="d-flex justify-content-end">
     <?php if ($logado == '19111413'): ?>
-      <button id="CorN" class="me-5 d-flex btn btn-danger"><i class="bi bi-camera-reels-fill"></i></button>
+      <?php
+        if ($result_config->num_rows > 0) {
+          while ($info_config = mysqli_fetch_assoc($result_config)) {
+            if ($info_config['filme_AorF'] == 1){
+              echo '<a href="home.php?filme_AorF=0" class="btn btn-success me-5 d-flex"><i class="bi bi-camera-reels-fill"></i></a>';
+            } else {
+              if ($info_config['filme_AorF'] == 0){
+                echo '<a href="home.php?filme_AorF=1" class="btn btn-danger me-5 d-flex"><i class="bi bi-camera-reels-fill"></i></a>';
+              }
+            }
+          }
+        }
+        ?>
     <?php endif; ?>
+
     <?php if ($result->num_rows <= 0): ?>
       <button id="toggleButton" class="me-5 d-flex btn btn-primary" disabled>
         <i id="icon1" class="bi bi-caret-down-fill me-2" style="display: none" ;></i>
@@ -134,7 +164,7 @@ $result = $conn->query($sql);
   <div class="w-100 d-flex justify-content-end">
     <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
       <i class="bi bi-film me-2 icon-filme"></i>
-      <p id="dia-ifilmes" class="m-0 badge text-bg-danger "></p>
+      <p id="dia-ifilmes" class="m-0 badge <?php echo $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';?>"></p>
     </div>
   </div>
 

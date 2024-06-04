@@ -33,6 +33,24 @@ if (isset($_POST['filme_id'])) {
 // Consulta os filmes no banco de dados
 $sql = "SELECT * FROM filmes_tb ORDER BY id DESC";
 $result = $conn->query($sql);
+
+//configuração
+$sql_config = "SELECT * FROM config_tb WHERE id = 1";
+$result_config = $conn->query($sql_config);
+$row = mysqli_fetch_assoc($result_config);
+
+if(isset($_GET['voto_AorF'])){
+    $voto_AorF = $_GET['voto_AorF'];
+    $sql_config = "UPDATE config_tb SET voto_AorF = $voto_AorF WHERE id = 1";
+    $result_config = $conn->query($sql_config);
+    header('Location: voto.php');
+} else if (isset($_GET['voto_AorF']) == FALSE){
+    $sql_config = "SELECT * FROM config_tb WHERE id = 1";
+    $result_config = $conn->query($sql_config);
+}
+$voto_AorF = $row['voto_AorF'];
+
+//configuração
 ?>
 
 <!DOCTYPE html>
@@ -103,13 +121,25 @@ $result = $conn->query($sql);
     <div class="d-flex justify-content-end">
         <?php if ($logado == '19111413'): ?>
             <!--Botão de parar tudo-->
-            <button class="navbar-brand d-flex align-items-center text-white btn btn-success Fechar me-2" id="fecharInputs"
-                style=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
-                    class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
-                    <path
-                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
-                </svg>
-            </button>
+            <?php if ($row['voto_AorF'] == 1): ?>
+                <a href="voto.php?voto_AorF=0" class="navbar-brand d-flex align-items-center text-white btn btn-success Fechar me-2" id="fecharInputs"
+                    style=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
+                        class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
+                    </svg>
+                </a>
+            <?php else: ?>
+                <?php if ($row['voto_AorF'] == 0): ?>
+                    <a href="voto.php?voto_AorF=1" class="navbar-brand d-flex align-items-center text-white btn btn-danger Fechar me-2" id="fecharInputs"
+                        style=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
+                            class="bi bi-play-circle-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
+                        </svg>
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
             <!--Botão de parar tudo-->
         <?php endif; ?>
         <?php if ($result->num_rows <= 0): ?>
@@ -135,6 +165,7 @@ $result = $conn->query($sql);
                 $query_check_vote = "SELECT * FROM votos_usuarios WHERE filme_id = {$info_filme['id']} AND matricula = '$logado'";
                 $result_check_vote = $conn->query($query_check_vote);
                 $disabled = $result_check_vote->num_rows > 0 ? "disabled" : "";
+                $voto_AorF = $voto_AorF == 0 ? "disabled" : " ";
 
                 echo '<div class="card border border-2 rounded bg-primary border-primary" style="width: 18rem;">';
                 if ($logado == '19111413') {
@@ -153,7 +184,7 @@ $result = $conn->query($sql);
                 echo '<li class="list-group-item">Inserido por: ' . $info_filme["posto_por"] . '</li>';
                 echo '<form method="post" action="voto.php" class="w-100" style="display: flex;">';
                 echo '<input type="hidden" name="filme_id" value="' . $info_filme["id"] . '">';
-                echo '<button type="submit" class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary"' . $disabled . '>Votar</button>';
+                echo '<button type="submit" class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary"' . $disabled . $voto_AorF . '>Votar</button>';
                 echo '</form>';
                 echo '</ul>';
                 echo '</div>';
@@ -169,7 +200,8 @@ $result = $conn->query($sql);
     <div class="w-100 d-flex justify-content-end">
         <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
             <i class="bi bi-film me-2 icon-filme"></i>
-            <p id="dia-ifilmes" class="m-0 badge text-bg-danger "></p>
+            <p id="dia-ifilmes"
+                class="m-0 badge <?php echo $row['filme_AorF'] == 1 ? 'text-bg-success' : 'text-bg-danger'; ?> "></p>
         </div>
     </div>
 

@@ -15,6 +15,11 @@ if ($logado != '19111413') {
     header('Location: home.php');
     exit();
 }
+//configuração
+$sql_config = "SELECT * FROM config_tb WHERE id = 1";
+$result_config = $conn->query($sql_config);
+$row = mysqli_fetch_assoc($result_config);
+//configuração
 ?>
 
 <!DOCTYPE html>
@@ -164,7 +169,7 @@ if ($logado != '19111413') {
     <div class="w-100 d-flex justify-content-end">
         <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
             <i class="bi bi-film me-2 icon-filme"></i>
-            <p id="dia-ifilmes" class="m-0 badge text-bg-danger "></p>
+            <p id="dia-ifilmes" class="m-0 badge <?php echo $row['filme_AorF'] == 1 ? 'text-bg-success' : 'text-bg-danger';?> "></p>
         </div>
     </div>
 
