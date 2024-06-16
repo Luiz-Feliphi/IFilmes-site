@@ -64,6 +64,7 @@ $voto_AorF = $row['voto_AorF'];
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="shortcut icon" href="../img/movie.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>IFilmes Web Site</title>
 </head>
 
@@ -123,7 +124,7 @@ $voto_AorF = $row['voto_AorF'];
             <!--Botão de parar tudo-->
             <?php if ($row['voto_AorF'] == 1): ?>
                 <a href="voto.php?voto_AorF=0" class="navbar-brand d-flex align-items-center text-white btn btn-success Fechar me-2" id="fecharInputs"
-                    style=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
+                    ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
                         class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
                         <path
                             d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
@@ -132,7 +133,7 @@ $voto_AorF = $row['voto_AorF'];
             <?php else: ?>
                 <?php if ($row['voto_AorF'] == 0): ?>
                     <a href="voto.php?voto_AorF=1" class="navbar-brand d-flex align-items-center text-white btn btn-danger Fechar me-2" id="fecharInputs"
-                        style=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
+                        ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="currentColor"
                             class="bi bi-play-circle-fill" viewBox="0 0 16 16">
                             <path
                                 d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z" />
@@ -161,12 +162,15 @@ $voto_AorF = $row['voto_AorF'];
         <?php
         if ($result->num_rows > 0) {
             while ($info_filme = mysqli_fetch_assoc($result)) {
-                // Verifica se o usuário já votou neste filme
+            // Verifica se o usuário já votou neste filme
                 $query_check_vote = "SELECT * FROM votos_usuarios WHERE filme_id = {$info_filme['id']} AND matricula = '$logado'";
                 $result_check_vote = $conn->query($query_check_vote);
-                $disabled = $result_check_vote->num_rows > 0 ? "disabled" : "";
-                $voto_AorF = $voto_AorF == 0 ? "disabled" : " ";
-
+                $votoORnao = mysqli_fetch_assoc($result_check_vote);
+                if($voto_AorF == 0 || $votoORnao['matricula'] == $logado && $votoORnao['filme_id'] == $info_filme['id']){
+                    $disabled = "disabled";
+                } else {
+                    $disabled = "";
+                }
                 echo '<div class="card border border-2 rounded bg-primary border-primary" style="width: 18rem;">';
                 if ($logado == '19111413') {
                     echo '<div class="d-flex w-100 justify-content-end btn-group" role="group" style="background-color: #E2E3E5;" >';
@@ -184,7 +188,7 @@ $voto_AorF = $row['voto_AorF'];
                 echo '<li class="list-group-item">Inserido por: ' . $info_filme["posto_por"] . '</li>';
                 echo '<form method="post" action="voto.php" class="w-100" style="display: flex;">';
                 echo '<input type="hidden" name="filme_id" value="' . $info_filme["id"] . '">';
-                echo '<button type="submit" class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary"' . $disabled . $voto_AorF . '>Votar</button>';
+                echo '<input type="submit" class="list-group-item btn w-100 h-100 rounded-0 rounded-bottom btn-primary"  value="Votar"'.$disabled.'>';
                 echo '</form>';
                 echo '</ul>';
                 echo '</div>';
@@ -204,8 +208,51 @@ $voto_AorF = $row['voto_AorF'];
                 class="m-0 badge <?php echo $row['filme_AorF'] == 1 ? 'text-bg-success' : 'text-bg-danger'; ?> "></p>
         </div>
     </div>
+    <script>
+        const dia_ifilmes = document.getElementById('dia-ifilmes');
+        const button_descricao = document.getElementById('toggleButton');
+        const descricao = document.getElementsByClassName('descricao');
 
-    <script src="../js/script-home_.js"></script>
+        function proximaSexta() {
+            const hoje = new Date();
+            let proximaSexta = new Date(hoje);
+            proximaSexta.setDate(hoje.getDate() + (5 - hoje.getDay() + 7) % 7);
+            const dia = proximaSexta.getDate();
+            const mes = proximaSexta.getMonth() + 1;
+            let diaFormatado = dia < 10 ? '0' + dia : dia;
+            let mesFormatado = mes < 10 ? '0' + mes : mes;
+            return diaFormatado + '/' + mesFormatado;
+        }
+
+        if (dia_ifilmes) {
+            dia_ifilmes.innerText = proximaSexta();
+        }
+
+        button_descricao.addEventListener('click', function() {
+            var icon1 = document.getElementById('icon1');
+            var icon2 = document.getElementById('icon2');
+
+            if (icon1.style.display === 'none') {
+                icon1.style.display = 'block';
+                icon2.style.display = 'none';
+                for (let i = 0; i < descricao.length; i++) {
+                    descricao[i].style.display = 'block';
+                }
+            } else {
+                icon1.style.display = 'none';
+                icon2.style.display = 'block';
+                for (let i = 0; i < descricao.length; i++) {
+                    descricao[i].style.display = 'none';
+                }
+            }
+        });
+
+        window.addEventListener('load', function() {
+            
+        });
+        // Exibe o dia e o mês da próxima sexta-feira no elemento dia-ifilmes
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
@@ -215,30 +262,6 @@ $voto_AorF = $row['voto_AorF'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
-    <!--
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Define o estado inicial das votações com base no localStorage
-            let votingEnabled = localStorage.getItem('votingEnabled') !== 'false';
-            const toggleVotesButton = document.getElementById('toggleVotes');
-            const voteButtons = document.querySelectorAll('form button[type="submit"]');
-
-            function setVotingState(enabled) {
-                voteButtons.forEach(button => button.disabled = !enabled);
-                toggleVotesButton.classList.toggle('btn-danger', enabled);
-                toggleVotesButton.classList.toggle('btn-success', !enabled);
-                localStorage.setItem('votingEnabled', enabled);
-            }
-
-            setVotingState(votingEnabled);
-
-            toggleVotesButton.addEventListener('click', function() {
-                votingEnabled = !votingEnabled;
-                setVotingState(votingEnabled);
-            });
-        });
-    </script>
-    -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var fecharInputs = document.getElementById('fecharInputs');
@@ -277,6 +300,12 @@ $voto_AorF = $row['voto_AorF'];
                     atualizarEstadoBotao();
                 }
             });
+        });
+    </script>
+    <script>
+        $('.card-img-top').on('error', function () {
+            console.log('A imagem falhou ao carregar.');
+            $(this).attr('src', 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'); // Substitui a imagem por uma alternativa
         });
     </script>
 </body>

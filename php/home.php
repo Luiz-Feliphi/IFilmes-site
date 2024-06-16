@@ -14,6 +14,9 @@ $sql_config = "SELECT * FROM config_tb WHERE id = 1";
 $result_config = $conn->query($sql_config);
 $info_config = mysqli_fetch_assoc($result_config);
 
+$filme_AorF = $info_config['filme_AorF'];
+$bg_class = $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';
+
 if (isset($_GET['filme_AorF'])) {
   $filme_AorF = $_GET['filme_AorF'];
   $sql_update = "UPDATE config_tb SET filme_AorF = $filme_AorF WHERE id = 1";
@@ -23,8 +26,8 @@ if (isset($_GET['filme_AorF'])) {
   $sql_config = "SELECT * FROM config_tb WHERE id = 1";
   $result_config = $conn->query($sql_config);
 }
-$filme_AorF = $info_config['filme_AorF'];
-$bg_class = $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';
+// configuração
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -99,16 +102,17 @@ $bg_class = $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';
           while ($info_config = mysqli_fetch_assoc($result_config)) {
             if ($info_config['filme_AorF'] == 1){
               echo '<a href="home.php?filme_AorF=0" class="btn btn-success me-5 d-flex"><i class="bi bi-camera-reels-fill"></i></a>';
+              $filme = 1;
             } else {
               if ($info_config['filme_AorF'] == 0){
                 echo '<a href="home.php?filme_AorF=1" class="btn btn-danger me-5 d-flex"><i class="bi bi-camera-reels-fill"></i></a>';
+                $filme = 0;
               }
             }
           }
         }
         ?>
     <?php endif; ?>
-
     <?php if ($result->num_rows <= 0): ?>
       <button id="toggleButton" class="me-5 d-flex btn btn-primary" disabled>
         <i id="icon1" class="bi bi-caret-down-fill me-2" style="display: none" ;></i>
@@ -160,15 +164,60 @@ $bg_class = $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';
   </div>
 
   </div>
+  <?php
+      if ($filme == 1) {
+        echo '<div class="w-100 d-flex justify-content-end"><div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary"><i class="bi bi-film me-2 icon-filme"></i><p id="dia-ifilmes" class="m-0 badge text-bg-success"></p></div></div>';
+      } else {
+        if ($filme == 0) {
+          echo '<div class="w-100 d-flex justify-content-end"><div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary"><i class="bi bi-film me-2 icon-filme"></i><p id="dia-ifilmes" class="m-0 badge text-bg-danger"></p></div></div>';
+        }
+      }
+  ?>
+  <script>
+  const dia_ifilmes = document.getElementById('dia-ifilmes');
+const button_descricao = document.getElementById('toggleButton');
+const descricao = document.getElementsByClassName('descricao');
 
-  <div class="w-100 d-flex justify-content-end">
-    <div class="d-flex align-items-center p-2 calender rounded-start-pill bg-primary">
-      <i class="bi bi-film me-2 icon-filme"></i>
-      <p id="dia-ifilmes" class="m-0 badge <?php echo $filme_AorF == 1 ? 'text-bg-success' : 'text-bg-danger';?>"></p>
-    </div>
-  </div>
+function proximaSexta() {
+    const hoje = new Date();
+    let proximaSexta = new Date(hoje);
+    proximaSexta.setDate(hoje.getDate() + (5 - hoje.getDay() + 7) % 7);
+    const dia = proximaSexta.getDate();
+    const mes = proximaSexta.getMonth() + 1;
+    let diaFormatado = dia < 10 ? '0' + dia : dia;
+    let mesFormatado = mes < 10 ? '0' + mes : mes;
+    return diaFormatado + '/' + mesFormatado;
+}
 
-  <script src="../js/script-home_.js"></script>
+if (dia_ifilmes) {
+    dia_ifilmes.innerText = proximaSexta();
+}
+
+button_descricao.addEventListener('click', function() {
+    var icon1 = document.getElementById('icon1');
+    var icon2 = document.getElementById('icon2');
+
+    if (icon1.style.display === 'none') {
+        icon1.style.display = 'block';
+        icon2.style.display = 'none';
+        for (let i = 0; i < descricao.length; i++) {
+            descricao[i].style.display = 'block';
+        }
+    } else {
+        icon1.style.display = 'none';
+        icon2.style.display = 'block';
+        for (let i = 0; i < descricao.length; i++) {
+            descricao[i].style.display = 'none';
+        }
+    }
+});
+
+window.addEventListener('load', function() {
+    
+});
+// Exibe o dia e o mês da próxima sexta-feira no elemento dia-ifilmes
+
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>

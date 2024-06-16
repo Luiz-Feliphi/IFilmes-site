@@ -1,7 +1,6 @@
 <?php
 session_start();
 include_once('config.php');
-
 $logado = $_SESSION['matricula'];
 $sql_sugestao = "SELECT * FROM sugeri_envi WHERE matricula = '$logado'";
 $result_sugestao = $conn->query($sql_sugestao);
@@ -17,7 +16,7 @@ $posto_por = $_POST['posto_por'];
 $imagem_link = $_POST['imagem_link'];
 
 // Insere os dados no banco de dados
-$sql = "INSERT INTO cadastrar_filmes (nome, descricao, posto_por, imagem_link, matricula) VALUES ('$nome', '$descricao', '$posto_por', '$imagem_link', '$logado')";
+$sql = "INSERT INTO cadastrar_filmes (nome, descricao, posto_por, imagem_link) VALUES ('$nome', '$descricao', '$posto_por', '$imagem_link')";
 $result = $conn->query($sql);
 
 // Verifica se a inserção foi bem-sucedida
